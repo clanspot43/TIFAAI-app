@@ -20,6 +20,7 @@ app.get('/products', async (req, res) => {
       },
     });
 
+    // Fix is here 👇
     if (!response.ok) {
       throw new Error(`Shopify responded with ${response.status}`);
     }
