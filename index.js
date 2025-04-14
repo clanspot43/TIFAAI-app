@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 
 // Shopify store and token
-const SHOPIFY_TOKEN = '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';
+const SHOPIFY_TOKEN = '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';
 const SHOPIFY_STORE = 'zu-lora.myshopify.com';
 
 app.get('/products', async (req, res) => {
@@ -20,7 +20,6 @@ app.get('/products', async (req, res) => {
       },
     });
 
-    // ✅ Only throw error if Shopify did NOT return success
     if (!response.ok) {
       throw new Error(`Shopify responded with ${response.status}`);
     }
