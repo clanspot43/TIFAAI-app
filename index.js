@@ -19,6 +19,7 @@ app.get('/products', async (req, res) => {
       },
     });
 
+    // ✅ FIX: Only throw if response is NOT OK
     if (!response.ok) {
       throw new Error(`Shopify responded with ${response.status}`);
     }
