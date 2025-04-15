@@ -8,7 +8,8 @@ app.use(cors());
 
 // Shopify token and store
 const SHOPIFY_TOKEN = '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'; // ← yours
-const SHOPIFY_STORE = 'zu-lora'; // ← only subdomain, no ".myshopify.com"
+const SHOPIFY_STORE = const SHOPIFY_STORE = 'twpti8-fd';
+; // ← only subdomain, no ".myshopify.com"
 
 // GET /products route
 app.get('/products', async (req, res) => {
