@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 
 // Shopify credentials
-const SHOPIFY_TOKEN = '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'; // Your Admin API token
+const SHOPIFY_TOKEN = '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'; // Your Admin API token
 const SHOPIFY_STORE = 'twpti8-fd'; // Only the subdomain
 
 // Main fetch function
