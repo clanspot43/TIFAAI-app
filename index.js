@@ -6,8 +6,9 @@ const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 
+// ✅ Correct token and domain
 const SHOPIFY_TOKEN = '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';
-const SHOPIFY_STORE = 'zu-lora.myshopify.com';
+const SHOPIFY_STORE = 'zu-lora.store'; // ✅ No .myshopify.com
 
 app.get('/products', async (req, res) => {
   try {
@@ -19,7 +20,7 @@ app.get('/products', async (req, res) => {
       },
     });
 
-    // ✅ FIX: Only throw if response is NOT OK
+    // ✅ Only throw error if Shopify did NOT return success
     if (!response.ok) {
       throw new Error(`Shopify responded with ${response.status}`);
     }
