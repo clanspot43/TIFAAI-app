@@ -1,7 +1,7 @@
 
 {
-  "name": "tifa-shopify-proxy",
-  "version": "1.0.0",
+  "name": "tifaai-shopify-full-auto",
+  "version": "1.2.0",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
