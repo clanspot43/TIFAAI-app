@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ Your live Shopify private API token and store
-const SHOPIFY_TOKEN = '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';
+const SHOPIFY_TOKEN = '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';
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 
 // 🔁 Auto-sync Shopify products every 5 minutes
