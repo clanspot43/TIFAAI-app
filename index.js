@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 
 // Shopify token and store
-const SHOPIFY_TOKEN = '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'; // ← Your token
+const SHOPIFY_TOKEN = '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'; // ← Your token
 const SHOPIFY_STORE = 'twpti8-fd'; 
 // GET /products route
 app.get('/products', async (req, res) => {
