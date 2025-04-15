@@ -9,17 +9,38 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json());
 
-// ✅ Your live Shopify private API token and store name
-const SHOPIFY_TOKEN = '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'; 
-const SHOPIFY_STORE = 'twpti8-fd.myshopify.com'; 
+// ✅ Your Shopify API token and store name (corrected)
+const SHOPIFY_TOKEN = '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';
+const SHOPIFY_STORE = 'twpti8-fd';
 
-// 🚀 Auto-sync Shopify products every 5 minutes
+// 🕒 Auto-sync products every 5 minutes (no user interaction needed)
 cron.schedule('*/5 * * * *', async () => {
   console.log('[TifaAI Background] Syncing...');
   await fetchShopifyData();
 });
 
-// 🌐 GET Shopify product data
+// 🛠 Reusable function to fetch data
+async function fetchShopifyData() {
+  const url = `https://${SHOPIFY_STORE}.myshopify.com/admin/api/2024-01/products.json`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-Shopify-Access-Token': SHOPIFY_TOKEN,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Shopify responded with ${response.status}`);
+  }
+
+  const data = await response.json();
+  console.log('[TifaAI Synced]', data.products?.length || 0, 'products');
+  return data;
+}
+
+// 🔓 Public route to trigger product sync manually (optional)
 app.get('/products', async (req, res) => {
   try {
     const data = await fetchShopifyData();
@@ -29,32 +50,11 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// 🧠 Actual sync logic (used by both cron + endpoint)
-async function fetchShopifyData() {
-  const url = `https://${SHOPIFY_STORE}.myshopify.com/admin/api/2024-01/products.json`;
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'X-Shopify-Access-Token': SHOPIFY_TOKEN,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Shopify responded with ${response.status}`);
-  }
-
-  const json = await response.json();
-  console.log(`[TifaAI Synced] Products: ${json.products.length}`);
-  return json;
-}
-
-// ✅ Basic test route
+// 🟢 App root confirmation
 app.get('/', (req, res) => {
-  res.send('TifaAI Full Auto Proxy is Active.');
+  res.send('TifaAI Shopify Proxy is live and syncing.');
 });
 
-// 🔥 Start the server
 app.listen(PORT, () => {
   console.log(`TifaAI Proxy running on port ${PORT}`);
 });
