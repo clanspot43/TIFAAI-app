@@ -6,13 +6,14 @@ const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 
-// ✅ Correct token and domain
-const SHOPIFY_TOKEN = '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';
-const SHOPIFY_STORE = 'zu-lora.store'; // ✅ No .myshopify.com
+// Shopify token and store
+const SHOPIFY_TOKEN = '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'; // ← yours
+const SHOPIFY_STORE = 'zu-lora'; // ← only subdomain, no ".myshopify.com"
 
+// GET /products route
 app.get('/products', async (req, res) => {
   try {
-    const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
+    const response = await fetch(`https://${SHOPIFY_STORE}.myshopify.com/admin/api/2024-01/products.json`, {
       method: 'GET',
       headers: {
         'X-Shopify-Access-Token': SHOPIFY_TOKEN,
@@ -20,7 +21,7 @@ app.get('/products', async (req, res) => {
       },
     });
 
-    // ✅ Only throw error if Shopify did NOT return success
+    // ✅ Throw only if response is not OK
     if (!response.ok) {
       throw new Error(`Shopify responded with ${response.status}`);
     }
@@ -35,10 +36,13 @@ app.get('/products', async (req, res) => {
   }
 });
 
+// Root endpoint
 app.get('/', (req, res) => {
   res.send('TifaAI Shopify Proxy is running.');
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Proxy server running at http://localhost:${PORT}`);
 });
+
