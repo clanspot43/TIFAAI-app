@@ -1,8 +1,8 @@
 
 {
-  "name": "tifaai-ultra",
+  "name": "tifaai-ultra-all",
   "version": "1.0.0",
-  "description": "TifaAI Ultra Automation - Shopify + TikTok + CJdropshipping",
+  "description": "Ultra automation for Shopify, TikTok, and CJdropshipping",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -11,6 +11,6 @@
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
     "node-cron": "^3.0.2",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.11"
   }
 }
