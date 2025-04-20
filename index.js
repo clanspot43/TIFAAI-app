@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const SHOPIFY_TOKEN = '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';
+const SHOPIFY_TOKEN = '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';
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 
 app.use(bodyParser.json());
