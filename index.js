@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const SHOPIFY_TOKEN = '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';
+const SHOPIFY_TOKEN = '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';
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 
 app.use(bodyParser.json());
