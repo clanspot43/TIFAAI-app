@@ -1,4 +1,3 @@
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const cron = require('node-cron');
@@ -12,6 +11,11 @@ const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
+
+// Home route (Fix for Cannot GET /)
+app.get('/', (req, res) => {
+  res.send('🛠️ TifaAI Shopify Proxy is running babe!');
+});
 
 // Auto Shopify Product Fetch
 app.get('/products', async (req, res) => {
