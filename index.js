@@ -23,17 +23,25 @@ app.get('/', (req, res) => {
 });
 
 app.get('/products', async (req, res) => {
+  console.log('➡️ /products called by:', req.headers['user-agent'] || 'unknown');
   try {
     const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': SHOPIFY_TOKEN
+        'X-Shopify-Access-Token': SHOPIFY_TOKEN,
+        'Content-Type': 'application/json'
       }
     });
+
+    if (!response.ok) {
+      console.error(`Shopify API Error: ${response.status}`);
+      return res.status(response.status).json({ error: `Shopify returned ${response.status}` });
+    }
+
     const data = await response.json();
     res.status(200).json(data);
   } catch (err) {
+    console.error('❌ Internal Fetch Error:', err.message);
     res.status(500).json({ error: 'Failed to fetch products', detail: err.message });
   }
 });
