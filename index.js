@@ -1,4 +1,4 @@
-// index.js (FULL BUILD CODE – PUBLIC + FIXED) const express = require('express'); const bodyParser = require('body-parser'); const cors = require('cors'); const cron = require('node-cron'); const fetch = require('node-fetch');
+// index.js (FINAL FIXED VERSION) const express = require('express'); const bodyParser = require('body-parser'); const cors = require('cors'); const cron = require('node-cron'); const fetch = require('node-fetch');
 
 const app = express(); const PORT = process.env.PORT || 10000;
 
@@ -10,7 +10,7 @@ app.use(cors()); app.use(bodyParser.json()); app.use(express.static('public'));
 
 // Home Route app.get('/', (req, res) => { res.send('🛠️ TifaAI Shopify Proxy is running babe!'); });
 
-// Shopify Products Route (NO HEADERS REQUIRED from client) app.get('/products', async (req, res) => { try { const response = await fetch(https://${SHOPIFY_STORE}/admin/api/2024-01/products.json, { method: 'GET', headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': SHOPIFY_TOKEN } }); const data = await response.json(); res.status(200).json(data); } catch (err) { res.status(500).json({ error: 'Failed to fetch products', detail: err.message }); } });
+// Shopify Products Route (open to public for GPT access) app.get('/products', async (req, res) => { try { const response = await fetch(https://${SHOPIFY_STORE}/admin/api/2024-01/products.json, { method: 'GET', headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': SHOPIFY_TOKEN } }); const data = await response.json(); res.status(200).json(data); } catch (err) { res.status(500).json({ error: 'Failed to fetch products', detail: err.message }); } });
 
 // Webhook Handler app.post('/webhook/shopify', (req, res) => { console.log('⚠️ Webhook received from Shopify:', req.body); res.sendStatus(200); });
 
