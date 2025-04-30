@@ -14,16 +14,20 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+// Health check route
 app.get('/health', (req, res) => {
   res.send({ status: 'ok', message: 'TifaAI backend alive' });
 });
 
+// Home route
 app.get('/', (req, res) => {
   res.send('🛠️ TifaAI Shopify Proxy is running babe!');
 });
 
+// Product fetch route (for GPT access)
 app.get('/products', async (req, res) => {
   console.log('➡️ /products called by:', req.headers['user-agent'] || 'unknown');
+
   try {
     const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
       method: 'GET',
@@ -34,35 +38,44 @@ app.get('/products', async (req, res) => {
     });
 
     if (!response.ok) {
-      console.error(`Shopify API Error: ${response.status}`);
+      console.error(`❌ Shopify API Error: ${response.status}`);
       return res.status(response.status).json({ error: `Shopify returned ${response.status}` });
     }
 
     const data = await response.json();
-    res.status(200).json(data);
+    res.status(200).json({
+      status: 'success',
+      called_by: req.headers['user-agent'] || 'unknown',
+      products: data
+    });
   } catch (err) {
     console.error('❌ Internal Fetch Error:', err.message);
     res.status(500).json({ error: 'Failed to fetch products', detail: err.message });
   }
 });
 
+// Shopify webhook route
 app.post('/webhook/shopify', (req, res) => {
   console.log('⚠️ Webhook received:', req.body);
   res.sendStatus(200);
 });
 
+// CJdropshipping mock route
 app.get('/cj', (req, res) => {
   res.send('📦 CJdropshipping module online.');
 });
 
+// TikTok mock route
 app.get('/tiktok', (req, res) => {
   res.send('📲 TikTok ad manager online.');
 });
 
+// Coming soon UI panel
 app.get('/ui', (req, res) => {
   res.send('<h2>🧠 TifaAI UI Panel (coming soon)</h2>');
 });
 
+// GPT command executor route
 app.post('/command', (req, res) => {
   const cmd = req.body.command?.toLowerCase();
   if (cmd?.includes('tiktok')) res.send('📲 TikTok module upgraded!');
@@ -72,6 +85,7 @@ app.post('/command', (req, res) => {
   else res.send('❓ Unknown command.');
 });
 
+// Cron task every 10 mins
 cron.schedule('*/10 * * * *', () => {
   console.log('⏱️ Cron: Running auto-sync...');
 });
