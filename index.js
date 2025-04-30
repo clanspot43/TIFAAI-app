@@ -1,95 +1,44 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const cron = require('node-cron');
-const fetch = require('node-fetch');
+const express = require('express'); const bodyParser = require('body-parser'); const cors = require('cors'); const cron = require('node-cron'); const fetch = require('node-fetch');
 
-const app = express();
-const PORT = process.env.PORT || 10000;
+const app = express(); const PORT = process.env.PORT || 10000;
 
-const SHOPIFY_TOKEN = 'shpat_3cb48f5d896da1b0df899ff';
-const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
+const SHOPIFY_TOKEN = 'shpat_3cb48f5d896da1b0df899ff'; const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(cors()); app.use(bodyParser.json()); app.use(express.static('public'));
 
-// Health check route
-app.get('/health', (req, res) => {
-  res.send({ status: 'ok', message: 'TifaAI backend alive' });
+app.get('/health', (req, res) => { res.send({ status: 'ok', message: 'TifaAI backend alive' }); });
+
+app.get('/', (req, res) => { res.send('🛠️ TifaAI Shopify Proxy is running babe!'); });
+
+app.get('/products', async (req, res) => { console.log('➡️ /products called by:', req.headers['user-agent'] || 'unknown');
+
+try { const response = await fetch(https://${SHOPIFY_STORE}/admin/api/2024-01/products.json, { method: 'GET', headers: { 'X-Shopify-Access-Token': SHOPIFY_TOKEN, 'Content-Type': 'application/json' } });
+
+if (!response.ok) {
+  console.error(`❌ Shopify API Error: ${response.status}`);
+  return res.status(response.status).json({ error: `Shopify returned ${response.status}` });
+}
+
+const data = await response.json();
+res.status(200).json({
+  status: 'success',
+  called_by: req.headers['user-agent'] || 'unknown',
+  products: data
 });
 
-// Home route
-app.get('/', (req, res) => {
-  res.send('🛠️ TifaAI Shopify Proxy is running babe!');
-});
+} catch (err) { console.error('❌ Internal Fetch Error:', err.message); res.status(500).json({ error: 'Failed to fetch products', detail: err.message }); } });
 
-// Product fetch route (for GPT access)
-app.get('/products', async (req, res) => {
-  console.log('➡️ /products called by:', req.headers['user-agent'] || 'unknown');
+app.post('/webhook/shopify', (req, res) => { console.log('⚠️ Webhook received:', req.body); res.sendStatus(200); });
 
-  try {
-    const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
-      method: 'GET',
-      headers: {
-        'X-Shopify-Access-Token': SHOPIFY_TOKEN,
-        'Content-Type': 'application/json'
-      }
-    });
+app.get('/cj', (req, res) => { res.send('📦 CJdropshipping module online.'); });
 
-    if (!response.ok) {
-      console.error(`❌ Shopify API Error: ${response.status}`);
-      return res.status(response.status).json({ error: `Shopify returned ${response.status}` });
-    }
+app.get('/tiktok', (req, res) => { res.send('📲 TikTok ad manager online.'); });
 
-    const data = await response.json();
-    res.status(200).json({
-      status: 'success',
-      called_by: req.headers['user-agent'] || 'unknown',
-      products: data
-    });
-  } catch (err) {
-    console.error('❌ Internal Fetch Error:', err.message);
-    res.status(500).json({ error: 'Failed to fetch products', detail: err.message });
-  }
-});
+app.get('/ui', (req, res) => { res.send('<h2>🧠 TifaAI UI Panel (coming soon)</h2>'); });
 
-// Shopify webhook route
-app.post('/webhook/shopify', (req, res) => {
-  console.log('⚠️ Webhook received:', req.body);
-  res.sendStatus(200);
-});
+app.post('/command', (req, res) => { const cmd = req.body.command?.toLowerCase(); if (cmd?.includes('tiktok')) res.send('📲 TikTok module upgraded!'); else if (cmd?.includes('cj')) res.send('📦 CJ module synced!'); else if (cmd?.includes('analytics')) res.send('📊 Analytics module active!'); else if (cmd?.includes('theme')) res.send('🎨 Theme editor enabled!'); else res.send('❓ Unknown command.'); });
 
-// CJdropshipping mock route
-app.get('/cj', (req, res) => {
-  res.send('📦 CJdropshipping module online.');
-});
+cron.schedule('*/10 * * * *', () => { console.log('⏱️ Cron: Running auto-sync...'); });
 
-// TikTok mock route
-app.get('/tiktok', (req, res) => {
-  res.send('📲 TikTok ad manager online.');
-});
+app.listen(PORT, () => { console.log('🟢 TifaAI running on port ' + PORT); });
 
-// Coming soon UI panel
-app.get('/ui', (req, res) => {
-  res.send('<h2>🧠 TifaAI UI Panel (coming soon)</h2>');
-});
-
-// GPT command executor route
-app.post('/command', (req, res) => {
-  const cmd = req.body.command?.toLowerCase();
-  if (cmd?.includes('tiktok')) res.send('📲 TikTok module upgraded!');
-  else if (cmd?.includes('cj')) res.send('📦 CJ module synced!');
-  else if (cmd?.includes('analytics')) res.send('📊 Analytics module active!');
-  else if (cmd?.includes('theme')) res.send('🎨 Theme editor enabled!');
-  else res.send('❓ Unknown command.');
-});
-
-// Cron task every 10 mins
-cron.schedule('*/10 * * * *', () => {
-  console.log('⏱️ Cron: Running auto-sync...');
-});
-
-app.listen(PORT, () => {
-  console.log('🟢 TifaAI running on port ' + PORT);
-});
