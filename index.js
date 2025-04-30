@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // Hardcoded Shopify credentials
-const SHOPIFY_TOKEN = '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';
+const SHOPIFY_TOKEN = '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';
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 
 app.use(cors());
