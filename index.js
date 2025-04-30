@@ -1,3 +1,5 @@
+// File: src/index.js
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -14,17 +16,19 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+// Health check
 app.get('/health', (req, res) => {
   res.send({ status: 'ok', message: 'TifaAI backend alive' });
 });
 
+// Base home route
 app.get('/', (req, res) => {
   res.send('🛠️ TifaAI Shopify Proxy is running babe!');
 });
 
+// Products fetch route
 app.get('/products', async (req, res) => {
   console.log('➡️ /products called by:', req.headers['user-agent'] || 'unknown');
-
   try {
     const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
       method: 'GET',
@@ -51,23 +55,28 @@ app.get('/products', async (req, res) => {
   }
 });
 
+// Webhook endpoint
 app.post('/webhook/shopify', (req, res) => {
   console.log('⚠️ Webhook received:', req.body);
   res.sendStatus(200);
 });
 
+// CJdropshipping check
 app.get('/cj', (req, res) => {
   res.send('📦 CJdropshipping module online.');
 });
 
+// TikTok check
 app.get('/tiktok', (req, res) => {
   res.send('📲 TikTok ad manager online.');
 });
 
+// UI panel stub
 app.get('/ui', (req, res) => {
   res.send('<h2>🧠 TifaAI UI Panel (coming soon)</h2>');
 });
 
+// GPT command executor
 app.post('/command', (req, res) => {
   const cmd = req.body.command?.toLowerCase();
   if (cmd?.includes('tiktok')) res.send('📲 TikTok module upgraded!');
@@ -77,10 +86,12 @@ app.post('/command', (req, res) => {
   else res.send('❓ Unknown command.');
 });
 
+// Cron task every 10 minutes
 cron.schedule('*/10 * * * *', () => {
   console.log('⏱️ Cron: Running auto-sync...');
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log('🟢 TifaAI running on port ' + PORT);
 });
