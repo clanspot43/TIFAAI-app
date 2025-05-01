@@ -145,17 +145,20 @@ app.get('/ui', (req, res) => {
   res.send('<h2>🧠 TifaAI UI Panel (coming soon)</h2>');
 });
 
-// Command processor
+// ✅ Command processor for GPT control
 app.post('/command', (req, res) => {
   const cmd = req.body.command?.toLowerCase();
+  console.log('🧠 Command received:', cmd);
+
   if (cmd?.includes('tiktok')) res.send('📲 TikTok module upgraded!');
   else if (cmd?.includes('cj')) res.send('📦 CJ module synced!');
   else if (cmd?.includes('analytics')) res.send('📊 Analytics module active!');
   else if (cmd?.includes('theme')) res.send('🎨 Theme editor enabled!');
+  else if (cmd?.includes('description')) res.send('📝 Auto-descriptions activated!');
   else res.send('❓ Unknown command.');
 });
 
-// Auto-sync every 10 minutes
+// Cron job every 10 minutes
 cron.schedule('*/10 * * * *', () => {
   console.log('⏱️ Cron: Running auto-sync...');
 });
