@@ -15,7 +15,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-app.get('/', (req, res) => res.send('馃洜锔� TifaAI Shopify Proxy is running babe!'));
+app.get('/', (req, res) => res.send('🛠️ TifaAI Shopify Proxy is running babe!'));
 app.get('/health', (req, res) => res.send({ status: 'ok' }));
 
 app.get('/products', async (req, res) => {
@@ -55,4 +55,4 @@ app.post('/cj/import', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log('馃煝 TifaAI running on port ' + PORT));
+app.listen(PORT, () => console.log('🟢 TifaAI running on port ' + PORT));
