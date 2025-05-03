@@ -15,11 +15,19 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-app.get('/', (req, res) => res.send('馃洜锔� TifaAI Shopify Proxy is running babe!'));
-app.get('/health', (req, res) => res.send({ status: 'ok' }));
+app.get('/', (req, res) => {
+  console.log('馃煝 Root path hit');
+  res.send('馃洜锔� TifaAI is running (Vitals mode enabled)');
+});
+
+app.get('/health', (req, res) => {
+  console.log('鉂わ笍 Health check requested');
+  res.send({ status: 'ok', message: 'Proxy alive' });
+});
 
 app.get('/products', async (req, res) => {
   try {
+    console.log('馃摝 Fetching products from Shopify...');
     const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
       headers: {
         'X-Shopify-Access-Token': SHOPIFY_TOKEN,
@@ -27,8 +35,10 @@ app.get('/products', async (req, res) => {
       }
     });
     const data = await response.json();
+    console.log('鉁� Products received:', data.products?.length || 0);
     res.json({ status: 'success', products: data.products });
   } catch (err) {
+    console.error('鉂� Failed to fetch products:', err.message);
     res.status(500).json({ error: 'Fetch failed', detail: err.message });
   }
 });
@@ -40,6 +50,7 @@ app.post('/cj/import', async (req, res) => {
       pageNum: 1,
       keyword: req.body.keyword || 'fitness'
     };
+    console.log('馃寪 Sending request to CJ API...');
     const response = await fetch('https://developers.cjdropshipping.com/product/list', {
       method: 'POST',
       headers: {
@@ -49,10 +60,10 @@ app.post('/cj/import', async (req, res) => {
       body: JSON.stringify(queryPayload)
     });
     const data = await response.json();
+    console.log('鉁� CJ products imported:', data?.result?.length || 0);
     res.status(200).json({ status: 'imported', products: data.result });
   } catch (err) {
+    console.error('鉂� CJ import failed:', err.message);
     res.status(500).json({ error: 'CJ import failed', detail: err.message });
   }
 });
-
-app.listen(PORT, () => console.log('馃煝 TifaAI running on port ' + PORT));
