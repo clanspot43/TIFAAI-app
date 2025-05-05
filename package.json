@@ -1,13 +1,13 @@
 {
   "name": "tifaai-vitals",
   "version": "1.0.0",
-  "description": "Vitals-style automation for Shopify + CJdropshipping",
+  "description": "TifaAI engine with Vitals-like features, Shopify automation, and CJ import.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "node-cron": "^3.0.2",
