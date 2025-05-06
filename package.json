@@ -1,15 +1,31 @@
 {
-  "name": "tifaai-vitals-backend",
+  "name": "tifaai-shopify-vitals",
   "version": "1.0.0",
+  "description": "TifaAI Vitals Engine - embedded app for Shopify Admin",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "node-cron": "^3.0.2",
-    "node-fetch": "^2.6.12"
-  }
+    "node-fetch": "^2.6.9"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "shopify",
+    "tifa",
+    "vitals",
+    "embedded",
+    "admin",
+    "proxy"
+  ],
+  "author": "TifaAI for Zulora",
+  "license": "MIT"
 }
