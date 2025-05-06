@@ -1,16 +1,60 @@
-// server.js (Express + Shopify Embedded Style) const express = require('express'); const bodyParser = require('body-parser'); const cors = require('cors'); const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const fetch = require('node-fetch');
 
-const app = express(); const PORT = process.env.PORT || 3000;
+const app = express();
+const PORT = process.env.PORT || 10000;
 
-// Shopify credentials const SHOPIFY_TOKEN = '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'; const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
+const SHOPIFY_TOKEN = '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';
+const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
+const CJ_API_KEY = '04ec689d3dc248f3a15d14b425b3ad11';
 
-// Setup app.use(cors()); app.use(bodyParser.json()); app.use(express.static('public'));
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public'));
 
-// Embedded App Root app.get('/', (req, res) => { res.send(<html> <head> <title>TifaAI Vitals Engine</title> <meta name="viewport" content="width=device-width, initial-scale=1" /> </head> <body style="font-family:sans-serif; padding:40px"> <h1>TifaAI Vitals Engine is online!</h1> <p>This embedded app is connected to your Shopify store: <strong>${SHOPIFY_STORE}</strong></p> <ul> <li><a href="/products">View Products</a></li> <li><a href="/health">Health Check</a></li> </ul> </body> </html>); });
+app.get('/', (req, res) => {
+  res.send('🧠 TifaAI Vitals Engine is online!');
+});
 
-// Health check app.get('/health', (req, res) => { res.json({ status: 'ok', message: 'TifaAI embedded app running.' }); });
+app.get('/products', async (req, res) => {
+  try {
+    const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
+      headers: {
+        'X-Shopify-Access-Token': SHOPIFY_TOKEN,
+        'Content-Type': 'application/json'
+      }
+    });
+    const data = await response.json();
+    res.status(200).json({ status: 'success', products: data.products });
+  } catch (err) {
+    res.status(500).json({ error: 'Shopify fetch failed', detail: err.message });
+  }
+});
 
-// Products from Shopify app.get('/products', async (req, res) => { try { const response = await fetch(https://${SHOPIFY_STORE}/admin/api/2024-01/products.json, { headers: { 'X-Shopify-Access-Token': SHOPIFY_TOKEN, 'Content-Type': 'application/json', }, }); const data = await response.json(); res.send(<html><body> <h2>Products from Shopify (${data.products.length})</h2> <ul> ${data.products.map(p =><li>${p.title}</li>).join('')} </ul> <a href="/">Back</a> </body></html> ); } catch (err) { res.status(500).send(<p>Error loading products: ${err.message}</p><a href="/">Back</a>); } });
+app.post('/cj/import', async (req, res) => {
+  try {
+    const queryPayload = {
+      pageSize: 5,
+      pageNum: 1,
+      keyword: req.body.keyword || 'fitness'
+    };
+    const response = await fetch('https://developers.cjdropshipping.com/product/list', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'CJ-Access-Token': CJ_API_KEY
+      },
+      body: JSON.stringify(queryPayload)
+    });
+    const data = await response.json();
+    res.status(200).json({ status: 'imported', products: data.result });
+  } catch (err) {
+    res.status(500).json({ error: 'CJ import failed', detail: err.message });
+  }
+});
 
-app.listen(PORT, () => { console.log(🟢 TifaAI Embedded App running on port ${PORT}); });
-
+app.listen(PORT, () => {
+  console.log(`🟢 TifaAI Embedded App running on port ${PORT}`);
+});
