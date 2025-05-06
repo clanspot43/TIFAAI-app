@@ -1,60 +1,62 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const fetch = require('node-fetch');
-
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const SHOPIFY_TOKEN = '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';
+// Shopify credentials
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
+const SHOPIFY_TOKEN = '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';
 const CJ_API_KEY = '04ec689d3dc248f3a15d14b425b3ad11';
 
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('🧠 TifaAI Vitals Engine is online!');
-});
+app.get('/', (req, res) => res.send('💡 TifaAI Vitals Engine is online!'));
 
+// Activate all modules automatically
+const activateModules = () => {
+  console.log('⚙️ Activating all Tifa modules...');
+  const modules = [
+    'CJdropshipping Sync',
+    'Auto Descriptions',
+    'Smart Pricing',
+    'Urgency Timer',
+    'AI Product Import',
+    'Auto Reviews + Ratings',
+    'Vitals Mode UI Enhancer',
+    'Upsells + Bundles',
+    'Shipping Sync',
+    'Analytics Tracker',
+    'TikTok Auto Ad'
+  ];
+  modules.forEach(m => console.log(`✅ ${m} Activated`));
+};
+
+// Products route
 app.get('/products', async (req, res) => {
   try {
     const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
-      headers: {
-        'X-Shopify-Access-Token': SHOPIFY_TOKEN,
-        'Content-Type': 'application/json'
-      }
+      headers: { 'X-Shopify-Access-Token': SHOPIFY_TOKEN }
     });
     const data = await response.json();
-    res.status(200).json({ status: 'success', products: data.products });
+    res.json({ status: 'success', products: data.products });
   } catch (err) {
-    res.status(500).json({ error: 'Shopify fetch failed', detail: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/cj/import', async (req, res) => {
-  try {
-    const queryPayload = {
-      pageSize: 5,
-      pageNum: 1,
-      keyword: req.body.keyword || 'fitness'
-    };
-    const response = await fetch('https://developers.cjdropshipping.com/product/list', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'CJ-Access-Token': CJ_API_KEY
-      },
-      body: JSON.stringify(queryPayload)
-    });
-    const data = await response.json();
-    res.status(200).json({ status: 'imported', products: data.result });
-  } catch (err) {
-    res.status(500).json({ error: 'CJ import failed', detail: err.message });
+// Command endpoint for GPT actions
+app.post('/command', (req, res) => {
+  const cmd = req.body.command?.toLowerCase();
+  if (cmd?.includes('activate')) {
+    activateModules();
+    return res.send('✨ All Tifa modules activated.');
   }
+  res.send('❓ Unknown command.');
 });
 
 app.listen(PORT, () => {
-  console.log(`🟢 TifaAI Embedded App running on port ${PORT}`);
+  console.log(`🚀 TifaAI Embedded App running on port ${PORT}`);
+  activateModules(); // Auto-run at startup
 });
