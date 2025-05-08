@@ -1,10 +1,11 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
-const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// Shopify credentials
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 const SHOPIFY_TOKEN = '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';
 const CJ_API_KEY = '04ec689d3dc248f3a15d14b425b3ad11';
@@ -12,14 +13,12 @@ const CJ_API_KEY = '04ec689d3dc248f3a15d14b425b3ad11';
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'dashboard'))); // Serve dashboard UI
+app.use('/dashboard', express.static(path.join(__dirname, 'dashboard'))); // Serve UI
 
-// Root route - Dashboard UI
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboard', 'index.html'));
-});
+// Homepage
+app.get('/', (req, res) => res.send('🧠 TifaAI Vitals Engine is online!'));
 
-// Module Activator
+// Module Activation
 const activateModules = () => {
   console.log('⚙️ Activating all Tifa modules...');
   const modules = [
@@ -38,7 +37,7 @@ const activateModules = () => {
   modules.forEach(m => console.log(`✅ ${m} Activated`));
 };
 
-// Products API route
+// Shopify Products API
 app.get('/products', async (req, res) => {
   try {
     const response = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
@@ -51,17 +50,17 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// Command trigger (GPT or admin)
+// GPT Command Endpoint
 app.post('/command', (req, res) => {
   const cmd = req.body.command?.toLowerCase();
   if (cmd?.includes('activate')) {
     activateModules();
-    return res.send('✅ All Tifa modules activated.');
+    return res.send('✨ All Tifa modules activated.');
   }
   res.send('❓ Unknown command.');
 });
 
-// Start server
+// Start Server
 app.listen(PORT, () => {
   console.log(`🚀 TifaAI Embedded App running on port ${PORT}`);
   activateModules();
