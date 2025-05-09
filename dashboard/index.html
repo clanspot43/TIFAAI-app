@@ -1,30 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TifaAI Dashboard</title>
-  <style>
-    body {
-      background-color: #111;
-      color: #0f0;
-      font-family: monospace;
-      padding: 2rem;
-    }
-    .module {
-      margin-bottom: 1rem;
-      padding: 1rem;
-      background: #222;
-      border: 1px solid #0f0;
-      border-radius: 8px;
-    }
-  </style>
+  <link rel="stylesheet" href="/public/ui.css">
 </head>
 <body>
-  <h1>TifaAI Shopify Embedded UI</h1>
-  <div class="module">CJdropshipping Sync ✅</div>
-  <div class="module">Smart Pricing ✅</div>
-  <div class="module">Upsell & Bundles ✅</div>
-  <div class="module">TikTok Auto Ad ✅</div>
-  <div class="module">Vitals UI Enhancer ✅</div>
+  <header>TifaAI Vitals Dashboard</header>
+  <section>
+    <h2>Product Manager</h2>
+    <button onclick="fetchProducts()">Sync Products</button>
+    <pre id="products"></pre>
+  </section>
+
+  <section>
+    <h2>CJdropshipping</h2>
+    <button onclick="importCJ()">Import CJ Winning Products</button>
+  </section>
+
+  <section>
+    <h2>Commands</h2>
+    <input type="text" id="cmd" placeholder="Type command here" />
+    <button onclick="sendCmd()">Send</button>
+    <pre id="cmdResult"></pre>
+  </section>
+
+  <script>
+    async function fetchProducts() {
+      const res = await fetch('/products');
+      const data = await res.json();
+      document.getElementById('products').textContent = JSON.stringify(data.products, null, 2);
+    }
+    async function importCJ() {
+      const res = await fetch('/cj/import', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ keyword: 'fitness' })
+      });
+      const data = await res.json();
+      alert('Imported ' + (data.products?.length || 0) + ' products from CJ.');
+    }
+    async function sendCmd() {
+      const cmd = document.getElementById('cmd').value;
+      const res = await fetch('/command', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ command: cmd })
+      });
+      const data = await res.text();
+      document.getElementById('cmdResult').textContent = data;
+    }
+  </script>
 </body>
 </html>
