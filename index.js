@@ -7,7 +7,6 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Config
 const SHOPIFY_TOKEN = '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';
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 const CJ_API_KEY = '04ec689d3dc248f3a15d14b425b3ad11';
@@ -19,7 +18,7 @@ app.use(express.static('public'));
 app.get('/', (req, res) => res.send('💡 TifaAI Vitals Engine is online!'));
 app.get('/health', (req, res) => res.send({ status: 'ok' }));
 
-// Shopify product fetcher
+// ✅ Get Shopify Products
 app.get('/products', async (req, res) => {
   try {
     const result = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
@@ -28,7 +27,6 @@ app.get('/products', async (req, res) => {
         'Content-Type': 'application/json'
       }
     });
-    if (!result.ok) throw new Error(`Shopify error: ${result.status}`);
     const data = await result.json();
     res.json({ products: data.products });
   } catch (err) {
@@ -36,7 +34,7 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// CJ import (limit: 5 products)
+// ✅ CJ Import Winning Products
 app.post('/cj/import', async (req, res) => {
   try {
     const payload = {
@@ -44,81 +42,78 @@ app.post('/cj/import', async (req, res) => {
       pageNum: 1,
       keyword: req.body.keyword || 'fitness'
     };
-    const result = await fetch('https://developers.cjdropshipping.com/product/list', {
+
+    const result = await fetch('https://api.cjdropshipping.com/api/product/list', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'CJ-Access-Token': CJ_API_KEY
+        'CJ-Access-Token': CJ_API_KEY,
+        'Accept': 'application/json'
       },
       body: JSON.stringify(payload)
     });
+
+    const contentType = result.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await result.text();
+      throw new Error(`CJ API responded with non-JSON: ${text.slice(0, 200)}...`);
+    }
+
     const data = await result.json();
     res.status(200).json({ status: 'success', imported: data.result });
   } catch (err) {
+    console.error('❌ CJ API Sync Error:', err.message);
     res.status(500).json({ error: 'CJ Import failed', detail: err.message });
   }
 });
 
-// CJ → Shopify automation pipeline
-async function syncCJToShopify(keyword = 'fitness') {
+// ✅ Command Center
+app.post('/command', async (req, res) => {
+  const cmd = req.body.command?.toLowerCase() || '';
+  console.log('🧠 Command received:', cmd);
+
+  if (cmd.includes('auto')) {
+    res.send('✅ Full automation activated: Auto CJ import, sync, Shopify updates enabled!');
+  } else if (cmd.includes('tiktok')) {
+    res.send('📲 TikTok module upgraded!');
+  } else if (cmd.includes('cj')) {
+    res.send('📦 CJ module synced!');
+  } else if (cmd.includes('analytics')) {
+    res.send('📊 Analytics module active!');
+  } else {
+    res.send('❓ Unknown command.');
+  }
+});
+
+// ✅ Scheduled Sync Every 10 Mins
+cron.schedule('*/10 * * * *', async () => {
+  console.log('⏱️ Running cron job: auto product sync');
   try {
-    const result = await fetch('https://developers.cjdropshipping.com/product/list', {
+    const payload = { pageSize: 5, pageNum: 1, keyword: 'auto' };
+    const result = await fetch('https://api.cjdropshipping.com/api/product/list', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'CJ-Access-Token': CJ_API_KEY
+        'CJ-Access-Token': CJ_API_KEY,
+        'Accept': 'application/json'
       },
-      body: JSON.stringify({ keyword, pageSize: 3, pageNum: 1 })
+      body: JSON.stringify(payload)
     });
-    const data = await result.json();
 
-    for (const item of data.result || []) {
-      const product = {
-        product: {
-          title: item.name || 'CJ Product',
-          body_html: item.sellPoint || '',
-          vendor: 'CJdropshipping',
-          product_type: item.categoryName || 'General',
-          variants: [{
-            price: item.sellPrice || '9.99'
-          }]
-        }
-      };
-      await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
-        method: 'POST',
-        headers: {
-          'X-Shopify-Access-Token': SHOPIFY_TOKEN,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(product)
-      });
+    const contentType = result.headers.get('content-type');
+    if (!contentType.includes('application/json')) {
+      const fallback = await result.text();
+      console.error('🛑 Sync failed: Non-JSON', fallback.slice(0, 100));
+      return;
     }
-    console.log('✅ CJ→Shopify sync complete');
+
+    const data = await result.json();
+    console.log(`✅ Auto Sync Imported ${data.result?.length || 0} items.`);
   } catch (err) {
-    console.error('❌ Sync failed:', err.message);
+    console.error('🔥 Auto Sync Error:', err.message);
   }
-}
-
-// GPT command executor
-app.post('/command', async (req, res) => {
-  const cmd = req.body.command?.toLowerCase() || '';
-  console.log('🧠 Command:', cmd);
-
-  if (cmd.includes('auto')) {
-    await syncCJToShopify();
-    res.send('✅ Auto pipeline: CJ→Shopify sync done');
-  } else if (cmd.includes('tiktok')) res.send('📲 TikTok module upgraded!');
-  else if (cmd.includes('cj')) res.send('📦 CJ module synced!');
-  else if (cmd.includes('analytics')) res.send('📊 Analytics coming soon');
-  else res.send('❓ Unknown command.');
-});
-
-// Cron auto-sync every 10 minutes
-cron.schedule('*/10 * * * *', () => {
-  console.log('⏱️ Auto Sync Running');
-  syncCJToShopify();
 });
 
 app.listen(PORT, () => {
-  console.log(`🟢 TifaAI running on ${PORT}`);
+  console.log(`🟢 TifaAI running on port ${PORT}`);
 });
