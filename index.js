@@ -7,14 +7,18 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// API credentials
 const SHOPIFY_TOKEN = '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';
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 const CJ_API_KEY = '04ec689d3dc248f3a15d14b425b3ad11';
 
+// Middlewares
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use('/dashboard', express.static('dashboard'));
+app.use('/public', express.static('public'));
 
+// Routes
 app.get('/', (req, res) => res.send('💡 TifaAI Vitals Engine is online!'));
 app.get('/health', (req, res) => res.send({ status: 'ok' }));
 
@@ -72,22 +76,8 @@ app.post('/command', async (req, res) => {
   }
 });
 
-cron.schedule('*/10 * * * *', async () => {
+cron.schedule('*/10 * * * *', () => {
   console.log('⏱️ Running cron job: auto product sync');
-  try {
-    const result = await fetch('https://developers.cjdropshipping.com/product/list', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'CJ-Access-Token': CJ_API_KEY
-      },
-      body: JSON.stringify({ pageSize: 1, pageNum: 1, keyword: 'trending' })
-    });
-    const json = await result.json();
-    console.log('✅ Auto Sync Success:', json.result);
-  } catch (err) {
-    console.error('❌ Auto Sync Error:', err.message);
-  }
 });
 
 app.listen(PORT, () => {
