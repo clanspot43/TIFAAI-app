@@ -1,9 +1,7 @@
-sync function triggerCommand(cmd) {
-  const response = await fetch('/command', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ command: cmd })
-  });
-  const data = await response.text();
-  document.getElementById('status').innerText = data;
-}
+const root = document.getElementById('widget-root');
+root.innerHTML = `
+  <p>🚀 Ready to launch automation modules!</p>
+  <button onclick="alert('CJ Synced!')">Sync CJ</button>
+  <button onclick="alert('TikTok Upgraded!')">Upgrade TikTok</button>
+  <button onclick="alert('Analytics Activated!')">Enable Analytics</button>
+`;
