@@ -1,7 +1,7 @@
 {
-  "name": "tifaai-app",
+  "name": "tifaai-vitals",
   "version": "1.0.0",
-  "description": "TifaAI Automation Vitals Engine",
+  "description": "TifaAI Vitals Automation Server",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
