@@ -1,7 +1,7 @@
 {
-  "name": "tifaai-dashboard",
+  "name": "tifaai-app",
   "version": "1.0.0",
-  "description": "TifaAI Vitals automation with Shopify + CJ dropshipping",
+  "description": "TifaAI Automation Vitals Engine",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
