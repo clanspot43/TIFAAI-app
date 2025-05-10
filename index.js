@@ -7,22 +7,19 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// API credentials
 const SHOPIFY_TOKEN = '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';
 const SHOPIFY_STORE = 'twpti8-fd.myshopify.com';
 const CJ_API_KEY = '04ec689d3dc248f3a15d14b425b3ad11';
 
-// Middlewares
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/dashboard', express.static('dashboard'));
 app.use('/public', express.static('public'));
+app.use('/dashboard', express.static('dashboard'));
 
-// Routes
-app.get('/', (req, res) => res.send('💡 TifaAI Vitals Engine is online!'));
-app.get('/health', (req, res) => res.send({ status: 'ok' }));
+app.get('/', (_, res) => res.send('💡 TifaAI Vitals Engine online!'));
+app.get('/health', (_, res) => res.send({ status: 'ok' }));
 
-app.get('/products', async (req, res) => {
+app.get('/products', async (_, res) => {
   try {
     const result = await fetch(`https://${SHOPIFY_STORE}/admin/api/2024-01/products.json`, {
       headers: {
@@ -62,24 +59,15 @@ app.post('/cj/import', async (req, res) => {
 app.post('/command', async (req, res) => {
   const cmd = req.body.command?.toLowerCase() || '';
   console.log('🧠 Command received:', cmd);
-
-  if (cmd.includes('auto')) {
-    res.send('✅ Full automation activated: Auto CJ import, sync, Shopify updates enabled!');
-  } else if (cmd.includes('tiktok')) {
-    res.send('📲 TikTok module upgraded!');
-  } else if (cmd.includes('cj')) {
-    res.send('📦 CJ module synced!');
-  } else if (cmd.includes('analytics')) {
-    res.send('📊 Analytics module active!');
-  } else {
-    res.send('❓ Unknown command.');
-  }
+  if (cmd.includes('auto')) res.send('✅ Full automation: CJ + Shopify live!');
+  else if (cmd.includes('tiktok')) res.send('📲 TikTok module upgraded!');
+  else if (cmd.includes('cj')) res.send('📦 CJ module synced!');
+  else if (cmd.includes('analytics')) res.send('📊 Analytics module active!');
+  else res.send('❓ Unknown command.');
 });
 
 cron.schedule('*/10 * * * *', () => {
   console.log('⏱️ Running cron job: auto product sync');
 });
 
-app.listen(PORT, () => {
-  console.log(`🟢 TifaAI running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🟢 TifaAI running on ${PORT}`));
